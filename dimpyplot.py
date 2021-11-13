@@ -1,10 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
+import os
 
 ### Define LigPlot+ environment here
-components_cif = '/Applications/LigPlus/lib/params/components.cif' # Location of components.cif
-ligplot_plus = '/Applications/LigPlus/lib/exe_mac/' # Location of your LigPlus executable folder
+LigPlus_path = '/Your/Application/Path/LigPlus'
+wkdir = 'test_pdb'
+components_cif = f'{LigPlus_path}/params/components.cif' # Location of components.cif
+ligplot_plus = f'{LigPlus_path}/lib/exe_mac64/' # Location of your LigPlus executable folder
 
 ### Define the chains you want to process here
 chain1 = 'A'
@@ -37,12 +40,12 @@ def dimplot(filename):
 	# Run ligplot
 	subprocess.check_call([
 		'{}ligplot'.format(ligplot_plus), 'dimplot.pdb', '-wkdir', './',
-		'-prm', '/Applications/LigPlus/lib/params/dimplot.prm', '-ctype', '1'
+		'-prm', '{}/lib/params/dimplot.prm'.format(LigPlus_path), '-ctype', '1'
 		], shell = False)
 
 
 	# Rename trashy files
-	files_to_rename = [_ for _ in subprocess.check_output(['ls']).split('\n') if
+	files_to_rename = [_ for _ in os.listdir(wkdir) if
 		'dimplot.' in _[0:8] or 'ligplot.' in _[0:8]]
 
 	for file_to_rename in files_to_rename:
@@ -55,9 +58,11 @@ def dimplot(filename):
 def main():
 	"""Main function."""
 	# Get list of pdb files in the directory
-	pdb_files = [_ for _ in subprocess.check_output(['ls']).split('\n') if
-		_[-4:] == '.pdb' and 'dimplot' not in _ and 'ligplot' not in _]
+	pdb_files = [_ for _ in os.listdir(wkdir) if
+ 		(_[-4:] == '.pdb') and ('dimplot' not in _) and ('ligplot' not in _)]
+	print(pdb_files)
 	for pdb_file in pdb_files:
+		os.chdir(wkdir)
 		dimplot(filename=pdb_file)
 	quit()
 
