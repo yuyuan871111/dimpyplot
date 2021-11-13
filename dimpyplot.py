@@ -5,7 +5,7 @@ import os
 
 ### Define LigPlot+ environment here
 LigPlus_path = '/Your/Application/Path/LigPlus'
-components_cif = f'{LigPlus_path}/params/components.cif' # Location of components.cif
+components_cif = f'{LigPlus_path}/data/components.cif' # Location of components.cif
 ligplot_plus = f'{LigPlus_path}/lib/exe_mac64/' # Location of your LigPlus executable folder
 
 ### Define the chains you want to process here
