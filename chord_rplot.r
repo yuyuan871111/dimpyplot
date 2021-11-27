@@ -1,0 +1,126 @@
+#!/usr/bin/env Rscript
+args = commandArgs()
+
+## Example of chord plot: https://jokergoo.github.io/circlize_book/book/the-chorddiagram-function.html#reduce
+# Create an edge list: a list of connections between 10 origin nodes, and 10 destination nodes:
+#origin <- paste0("orig ", sample(c(1:10), 20, replace = T))
+#destination <- paste0("dest ", sample(c(1:10), 20, replace = T))
+#data <- data.frame(origin, destination)
+# Transform input data in a adjacency matrix
+#adjacencyData <- with(data, table(origin, destination))
+# Charge the circlize library
+#library(circlize)
+# Make the circular plot
+#chordDiagram(adjacencyData, transparency = 0.5)
+
+# import packages
+library(magrittr)
+suppressPackageStartupMessages(library(circlize))
+circos.clear()
+
+library("optparse")
+
+# set arguments here
+option_list = list(
+  make_option(c("-w", "--wkdir"), type="character", default="./test_pdb", metavar="character",
+              help="working directory; read and save your data here. [example= %default]"),
+  make_option(c("-n", "--pdb_name"), type="character", default="7a91_delta_npt_noPBC", 
+              help="output file name [example= %default]", metavar="character")
+)
+opt_parser = OptionParser(option_list=option_list)
+opt = parse_args(opt_parser)
+
+
+# data from wkdir
+pdb_name <- opt$pdb_name
+wkdir <- paste0(opt$wkdir, "/")
+
+# define function
+read_and_process <- function (wkdir, pdb_name, ext = '.dimplot.hhb.csv'){
+  if (ext == '.dimplot.hhb.csv') {
+    filename <- paste0(wkdir, pdb_name, ext)
+    data_origin <- read.csv(filename)
+    donor <- paste(data_origin$donor_chain, 
+                   data_origin$donor_aapos, 
+                   sep = '_')
+    receptor <- paste(data_origin$receptor_chain,
+                      data_origin$receptor_aapos, 
+                      sep = '_')
+    data <- data.frame(donor, receptor)
+    return(list(data, data_origin))
+    
+  } else if (ext == '.dimplot.nnb.csv'){
+    filename <- paste0(wkdir, pdb_name, ext)
+    data_origin <- read.csv(filename)
+    atom1 <- paste(data_origin$atom1_chain, data_origin$atom1_aapos, sep = '_')
+    atom2 <- paste(data_origin$atom2_chain, data_origin$atom2_aapos, sep = '_')
+    data <- data.frame(atom1, atom2)
+    return(list(data, data_origin))
+    
+  } else {
+    stop("please check your extension")
+  }
+}
+shift_to_same <- function(data, regex = "S1RBD_.*"){
+  data_temp <- data %>% sapply(., as.character)
+  for ( i in c(1:dim(data_temp)[1]) ){
+    if ( grepl(regex, data_temp[i,1]) ){
+      temp <- data_temp[i,1]
+      data_temp[i,1] <- data_temp[i,2]
+      data_temp[i,2] <- temp
+      
+    }
+  }
+  return(data.frame(data_temp))
+}
+
+## Hydrophobic bond show
+data_nnb <- read_and_process(wkdir, pdb_name, ext = '.dimplot.nnb.csv')
+
+## H bond show
+data_hhb <- read_and_process(wkdir, pdb_name, ext = '.dimplot.hhb.csv')
+if ( grepl("S1RBD_.*", data_nnb[[1]][1,1]) ){
+  data_hhb_shift <- shift_to_same(data_hhb[[1]])
+} else if ( grepl("hACE2_.*", data_nnb[[1]][1,1]) ){
+  data_hhb_shift <- shift_to_same(data_hhb[[1]], regex = "hACE2_.*")
+}
+
+
+## merge all data
+data_all <- data_hhb_shift
+colnames(data_all) <- c('Var1', 'Var2')
+data_temp <- data_nnb[[1]]
+colnames(data_temp) <- c('Var1', 'Var2')
+data_all <- rbind(data_all, data_temp)
+#chordDiagram(data_all) #check
+
+# Transform input data in a adjacency matrix
+adjacencyData <- with(data_all, table(Var1, Var2))
+
+# set  color for hydrophobic bond and h bond
+col_mat <- rand_color(length(adjacencyData), hue = 'green', luminosity = 'light')
+dim(col_mat) <- dim(adjacencyData)
+col_mat[1:dim(data_hhb_shift)[1], 1:dim(data_hhb_shift)[1]] <- '#ff2b2b' #color h bond interaction
+
+# group name: S1RBD, hACE2
+name <- unique(unlist(dimnames(adjacencyData)))
+name <- name[order(gsub("(\\w+)_\\w+([0-9]+)", "\\1", name), 
+                   as.numeric(gsub("(\\w+)_[A-Z]+([0-9]+)", "\\2", name)))]
+group <- structure(gsub("_.+", "", name), names = name)
+grid.col <-  gsub("S1RBD", "#ff8400", group) %>% gsub("hACE2", "#00c3ff", .) 
+
+
+# Make the circular plot (include saving)
+png(file=paste0(wkdir,"interaction_chord.png"), width=6, height=6, units = "in", res = 300) #save
+circos.par(start.degree =-5)
+col_fun = colorRamp2(range(adjacencyData), c("#FFEEEE", "#FF0000"), transparency = 0.5)
+chordDiagram(adjacencyData, group = group, col = col_mat, 
+             annotationTrack = c("grid"), grid.col = grid.col,
+             annotationTrackHeight = c(0.01), big.gap = 10,
+             preAllocateTracks = 1)
+circos.track(track.index = 1, panel.fun = function(x, y) {
+  circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, 
+              facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.5)
+}, bg.border = NA)
+title(gsub('_',' ', pdb_name))
+invisible(dev.off()) #save

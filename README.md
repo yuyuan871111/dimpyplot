@@ -10,8 +10,13 @@ A Python frontend to the LigPlot+ program, allowing batch processing of Protein 
 
 # How to Use
 1. Copy dimpyplot.py to the directory containing the PDB files you want to process (the working directory), or your $PATH.
-2. Edit lines 7-9 to tell dimpyplot.py where to find LigPlus on your computer.
-3. Edit line 12 to tell dimpyplot.py where is yourworking directory.
-4. Edit lines 13-14 to tell dimpyplot.py which protein chains you want to study.
-5. Do 'python3 dimpyplot.py'
+2. Run: `python3 dimplot`  
+    default:
+    ```
+    dimpyplot.py --LigPlus_path /Users/yuyuan/bin/LigPlus \  
+                 --components_cif /Users/yuyuan/bin/LigPlus/data/components.cif \  
+                 --ligplot_plus /Users/yuyuan/bin/LigPlus/lib/exe_mac64/ \  
+                 --wkdir ./test_pdb \  
+                 --chain1 A --chain2 B
+    ```
 6. Dimpyplot will process every PDB file in the working directory, generating new PDB files of the interaction surface, and PostScript files of the LigPlots.
