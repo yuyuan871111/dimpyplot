@@ -1,0 +1,33 @@
+                 Res.  Res       Flattened    
+            Atom Name  Num      coordinates   
+            ---- --- -----    ----------------
+RESDUE      CofM LYS A 353       3.000 -86.000
+RESDUE      CofM GLY A 354       4.000 -80.000
+RESDUE      CofM ASN B 501      -3.000 -80.000
+RESDUE      CofM GLY B 502      -4.000 -74.000
+RESDUE      CofM TYR B 505      -3.000 -70.000
+RESDUE      CofM MET A  82       3.000 -70.000
+RESDUE      CofM LYS B 417      -4.000 -64.000
+RESDUE      CofM GLN A  24       3.000 -64.000
+RESDUE      CofM ASN B 487      -4.000 -58.000
+RESDUE      CofM TYR A  83       4.000 -58.000
+RESDUE      CofM THR A  27       3.000 -54.000
+RESDUE      CofM PHE B 486      -3.000 -48.000
+RESDUE      CofM ASP A  30       4.000 -48.000
+RESDUE      CofM GLY B 476      -4.000 -42.000
+RESDUE      CofM SER A  19       4.000 -42.000
+RESDUE      CofM PHE B 456      -3.000 -36.000
+RESDUE      CofM LYS A  31       4.000 -36.000
+RESDUE      CofM ASP A  38       4.000 -30.000
+RESDUE      CofM TYR B 449      -4.000 -30.000
+RESDUE      CofM TYR B 489      -3.000 -26.000
+RESDUE      CofM TYR B 453      -4.000 -20.000
+RESDUE      CofM PHE A  28       3.000 -20.000
+RESDUE      CofM ASN A 330       3.000 -16.000
+RESDUE      CofM HIS A  34       4.000 -10.000
+RESDUE      CofM GLN B 493      -4.000 -10.000
+RESDUE      CofM TYR A  41       4.000  -4.000
+RESDUE      CofM SER B 494      -3.000  -4.000
+RESDUE      CofM THR B 500      -4.000   2.000
+RESDUE      CofM ASP A 355       3.000   6.000
+RESDUE      CofM ARG A 357       3.000  10.000

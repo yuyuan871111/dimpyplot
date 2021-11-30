@@ -23,15 +23,21 @@ library("optparse")
 # set arguments here
 option_list = list(
   make_option(c("-w", "--wkdir"), type="character", default="./test_pdb", metavar="character",
-              help="working directory; read and save your data here. [example= %default]"),
+              help="working directory; read and save your data here. [default= %default]"),
   make_option(c("-n", "--pdb_name"), type="character", default="7a91_delta_npt_noPBC", 
-              help="output file name [example= %default]", metavar="character")
+              help="input file name [default= %default]", metavar="character"),
+  make_option("--chain1_name", type="character", default="S1RBD",
+              help="one chain for analysis [default= %default]"),
+  make_option("--chain2_name", type="character", default="hACE2",
+              help="one chain for analysis [default= %default]")            
 )
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
 
 # data from wkdir
+chain1_name <- opt$chain1_name
+chain2_name <- opt$chain2_name
 pdb_name <- opt$pdb_name 
 wkdir <- paste0(opt$wkdir, "/")
 #debug
@@ -83,11 +89,14 @@ shift_to_same <- function(data, regex = "S1RBD_.*"){
 data_nnb <- read_and_process(wkdir, pdb_name, ext = '.dimplot.nnb.csv')
 
 ## H bond show
+chain1_regex <- paste0(chain1_name, "_.*")
+chain2_regex <- paste0(chain2_name, "_.*")
+
 data_hhb <- read_and_process(wkdir, pdb_name, ext = '.dimplot.hhb.csv')
-if ( grepl("S1RBD_.*", data_nnb[[1]][1,1]) ){
-  data_hhb_shift <- shift_to_same(data_hhb[[1]])
-} else if ( grepl("hACE2_.*", data_nnb[[1]][1,1]) ){
-  data_hhb_shift <- shift_to_same(data_hhb[[1]], regex = "hACE2_.*")
+if ( grepl(chain1_regex, data_nnb[[1]][1,1]) ){
+  data_hhb_shift <- shift_to_same(data_hhb[[1]], regex = chain1_regex)
+} else if ( grepl(chain2_regex, data_nnb[[1]][1,1]) ){
+  data_hhb_shift <- shift_to_same(data_hhb[[1]], regex = chain2_regex)
 }
 
 ## merge all data
@@ -111,12 +120,12 @@ rownames(adjacencyData) <- rownames(adjacencyData) %>% gsub("(\\w+)_[h|n|b]+","\
 colnames(adjacencyData) <- colnames(adjacencyData) %>% gsub("(\\w+)_[h|n|b]+","\\1", .)
 
 
-# group name: S1RBD, hACE2
+# group name: chain1, chain2
 name <- unique(unlist(dimnames(adjacencyData)))
 name <- name[order(gsub("(\\w+)_\\w+([0-9]+)", "\\1", name), 
                    as.numeric(gsub("(\\w+)_[A-Z]+([0-9]+)", "\\2", name)))]
 group <- structure(gsub("_.+", "", name), names = name)
-grid.col <-  gsub("S1RBD", "#ff8400", group) %>% gsub("hACE2", "#00c3ff", .) 
+grid.col <-  gsub(chain1_name, "#ff8400", group) %>% gsub(chain2_name, "#00c3ff", .) 
 
 
 # Make the circular plot (include saving)
