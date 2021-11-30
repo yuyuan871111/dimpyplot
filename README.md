@@ -6,7 +6,7 @@ A Python frontend to the LigPlot+ program, allowing batch processing of Protein 
 2. Python 3.7
 3. Install LigPlot+ from the EBI: http://www.ebi.ac.uk/thornton-srv/software/LigPlus/
 4. Download `components.cif` from the PDB: ftp://ftp.wwpdb.org/pub/pdb/data/monomers/components.cif  
-5. Ability to 'cd' in the Terminal  
+5. Ability to `cd` in the Terminal  
 
 ## How to Use
 1. Copy dimpyplot.py to the directory containing the PDB files you want to process (the working directory), or your $PATH.
@@ -50,7 +50,6 @@ With dimpyplot, you will get a series of interactions between two chains of prot
 
 Python3 script:
 ```
-import os
 from dimpyplot_chord import dimplot_chord
 
 wkdir = './test_pdb'                #change here
