@@ -32,6 +32,7 @@ With dimpyplot, you will get a series of interactions between two chains of prot
 * Red line represents H-bond interactions.  
 * Green-tone line represents hydrophobic interactions.  
 
+![sample chord plot](https://github.com/yuyuan871111/dimpyplot_chordplot/blob/master/sample_results/interaction_chord.png)
 
 ## Requirements
 1. Any requirements from dimpyplot  
