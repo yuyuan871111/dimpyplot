@@ -13,7 +13,7 @@
 
       Number of dictionary entries read in  =       0
   Opening output bonds file, ./hbadd.bonds ...
-HBPLUS Hydrogen Bond Calculator v 3.2            Nov 30 18:38:11 CST 2021
+HBPLUS Hydrogen Bond Calculator v 3.2            Nov 30 19:39:03 CST 2021
 (c) I McDonald, D Naylor, D Jones and J Thornton 1993 All Rights Reserved.
 
 Configured for 100000 atoms and 24000 residues.
@@ -101,7 +101,7 @@ WARNING: 151.81A between /B0537hLYS CB  and /B0537hLYS CG  ((H..)A-AA).
 WARNING: 151.81A between /B0537hLYS CB  and /B0537hLYS CG  ((D..)A-AA bond).
 WARNING: 151.81A between /B0537hLYS CG  and /B0537hLYS CB  ((H..)A-AA).
 19816 neighbour interactions found.
-HBPLUS Hydrogen Bond Calculator v 3.2            Nov 30 18:38:11 CST 2021
+HBPLUS Hydrogen Bond Calculator v 3.2            Nov 30 19:39:03 CST 2021
 (c) I McDonald, D Naylor, D Jones and J Thornton 1993 All Rights Reserved.
 
 Configured for 100000 atoms and 24000 residues.
