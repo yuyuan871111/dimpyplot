@@ -32,8 +32,11 @@ opt = parse_args(opt_parser)
 
 
 # data from wkdir
-pdb_name <- opt$pdb_name
+pdb_name <- opt$pdb_name 
 wkdir <- paste0(opt$wkdir, "/")
+#debug
+#pdb_name <- '7v80_beta_afterMD' 
+#wkdir <- '/Users/yuyuan/Desktop/Work/CMDM_Lab/COVID19_Proj_toGitHub/metadata/md_results/variants_7v80/beta/7v80_beta_afterMD_dimplot/'
 
 # define function
 read_and_process <- function (wkdir, pdb_name, ext = '.dimplot.hhb.csv'){
@@ -42,9 +45,11 @@ read_and_process <- function (wkdir, pdb_name, ext = '.dimplot.hhb.csv'){
     data_origin <- read.csv(filename)
     donor <- paste(data_origin$donor_chain, 
                    data_origin$donor_aapos, 
+                   'hhb',
                    sep = '_')
     receptor <- paste(data_origin$receptor_chain,
                       data_origin$receptor_aapos, 
+                      'hhb',
                       sep = '_')
     data <- data.frame(donor, receptor)
     return(list(data, data_origin))
@@ -52,8 +57,8 @@ read_and_process <- function (wkdir, pdb_name, ext = '.dimplot.hhb.csv'){
   } else if (ext == '.dimplot.nnb.csv'){
     filename <- paste0(wkdir, pdb_name, ext)
     data_origin <- read.csv(filename)
-    atom1 <- paste(data_origin$atom1_chain, data_origin$atom1_aapos, sep = '_')
-    atom2 <- paste(data_origin$atom2_chain, data_origin$atom2_aapos, sep = '_')
+    atom1 <- paste(data_origin$atom1_chain, data_origin$atom1_aapos, 'nnb', sep = '_')
+    atom2 <- paste(data_origin$atom2_chain, data_origin$atom2_aapos, 'nnb', sep = '_')
     data <- data.frame(atom1, atom2)
     return(list(data, data_origin))
     
@@ -85,7 +90,6 @@ if ( grepl("S1RBD_.*", data_nnb[[1]][1,1]) ){
   data_hhb_shift <- shift_to_same(data_hhb[[1]], regex = "hACE2_.*")
 }
 
-
 ## merge all data
 data_all <- data_hhb_shift
 colnames(data_all) <- c('Var1', 'Var2')
@@ -97,10 +101,15 @@ data_all <- rbind(data_all, data_temp)
 # Transform input data in a adjacency matrix
 adjacencyData <- with(data_all, table(Var1, Var2))
 
-# set  color for hydrophobic bond and h bond
-col_mat <- rand_color(length(adjacencyData), hue = 'green', luminosity = 'light')
+# set color for hydrophobic bond and h bond
+col_mat <- rand_color(length(adjacencyData), hue = 'green', luminosity = 'bright')
 dim(col_mat) <- dim(adjacencyData)
-col_mat[1:dim(data_hhb_shift)[1], 1:dim(data_hhb_shift)[1]] <- '#ff2b2b' #color h bond interaction
+col_mat[ adjacencyData < exp(log(max(adjacencyData))/3*2) ] <- '#dde0c1' # print little interactions in not so light green
+hhb_length <- colnames(adjacencyData) %>% grepl("_hhb$", .) %>% sum(.)
+col_mat[1:hhb_length, 1:hhb_length] <- '#d10000' #color h bond interaction (red)
+rownames(adjacencyData) <- rownames(adjacencyData) %>% gsub("(\\w+)_[h|n|b]+","\\1", .)
+colnames(adjacencyData) <- colnames(adjacencyData) %>% gsub("(\\w+)_[h|n|b]+","\\1", .)
+
 
 # group name: S1RBD, hACE2
 name <- unique(unlist(dimnames(adjacencyData)))
@@ -113,11 +122,11 @@ grid.col <-  gsub("S1RBD", "#ff8400", group) %>% gsub("hACE2", "#00c3ff", .)
 # Make the circular plot (include saving)
 png(file=paste0(wkdir,"interaction_chord.png"), width=6, height=6, units = "in", res = 300) #save
 circos.par(start.degree =-5)
-col_fun = colorRamp2(range(adjacencyData), c("#FFEEEE", "#FF0000"), transparency = 0.5)
+#col_fun = colorRamp2(range(adjacencyData), c("#FFEEEE", "#FF0000"), transparency = 0.5)
 chordDiagram(adjacencyData, group = group, col = col_mat, 
              annotationTrack = c("grid"), grid.col = grid.col,
              annotationTrackHeight = c(0.01), big.gap = 10,
-             preAllocateTracks = 1)
+             preAllocateTracks = 1, transparency = 0.53)
 circos.track(track.index = 1, panel.fun = function(x, y) {
   circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, 
               facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.5)
